@@ -1,42 +1,38 @@
- class Solution {
-    private char[][] board;
-    private int ROWS;
-    private int COLS;
-    private boolean[][] visited;
-
+class Solution {
     public boolean exist(char[][] board, String word) {
-        this.board = board;
-        this.ROWS = board.length;
-        this.COLS = board[0].length;
-        this.visited = new boolean[ROWS][COLS];
-
-        for (int row = 0; row < this.ROWS; ++row) {
-            for (int col = 0; col < this.COLS; ++col) {
-                if (this.backtrack(row, col, word, 0)) {
+        int m = board.length;
+        int n = board[0].length;
+        boolean[][] visited = new boolean[m][n];
+        
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (dfs(board, i, j, word, 0, visited)) {
                     return true;
                 }
             }
         }
+        
         return false;
     }
-
-    protected boolean backtrack(int row, int col, String word, int index) {
+    
+    private boolean dfs(char[][] board, int i, int j, String word, int index, boolean[][] visited) {
         if (index == word.length()) {
             return true;
         }
-        if (row < 0 || row == this.ROWS || col < 0 || col == this.COLS || this.visited[row][col] || this.board[row][col] != word.charAt(index)) {
+        
+        if (i < 0 || i >= board.length || j < 0 || j >= board[0].length || visited[i][j] || board[i][j] != word.charAt(index)) {
             return false;
         }
-
-        this.visited[row][col] = true;
-        int[] rowOffsets = {0, 1, 0, -1};
-        int[] colOffsets = {1, 0, -1, 0};
-        for (int d = 0; d < 4; ++d) {
-            if (backtrack(row + rowOffsets[d], col + colOffsets[d], word, index + 1)) {
-                return true;
-            }
-        }
-        this.visited[row][col] = false;
-        return false;
+        
+        visited[i][j] = true;
+        
+        boolean found = dfs(board, i + 1, j, word, index + 1, visited) ||
+                        dfs(board, i - 1, j, word, index + 1, visited) ||
+                        dfs(board, i, j + 1, word, index + 1, visited) ||
+                        dfs(board, i, j - 1, word, index + 1, visited);
+        
+        visited[i][j] = false;
+        
+        return found;
     }
 }
